@@ -38,6 +38,8 @@ beautifulsoup4==4.12.3
 bentoml==1.2.1
 bleach==6.2.0
 blinker==1.7.0
+boto3==1.36.16
+botocore==1.36.16
 bs4==0.0.2
 build==1.0.3
 CacheControl==0.14.0
@@ -373,6 +375,7 @@ rich==13.6.0
 rouge==1.0.1
 rpds-py==0.13.1
 rsa==4.9
+s3transfer==0.11.2
 safetensors==0.4.2
 schedule==1.2.2
 schema==0.7.5
