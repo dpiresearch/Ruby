@@ -14,6 +14,11 @@ import time
 
 aws_access_key_id = os.getenv('AWS_ACCESS_KEY')
 aws_secret_access_key = os.getenv('AWS_SECRET_KEY')
+#aws_access_key_id = "AKIAQZWJIPORVB4Y34GS"
+#aws_secret_access_key = "mX/37iw2Zw+SfxqBmtAYiixhYw3HpckNG+5zw82"
+
+
+print(f"Got access { aws_access_key_id}, got secrete {aws_secret_access_key}")
 
 # Create a session using provided credentials
 session = boto3.Session(
@@ -45,17 +50,21 @@ if 'Contents' in response:
 
 # Sort files by size in ascending order
 sorted_files = sorted(files, key=lambda x: x['Size'])
+response_files = [file for file in sorted_files if file['Key'].endswith('_response.txt')]
+response_filenames = [file['Key'] for file in sorted_files if file['Key'].endswith('_response.txt')]
 
 # Print the sorted list of files
 for file in sorted_files:
     print(f"=== Processing File: {file['Key']}, Size: {file['Size']} bytes")
-# Iterate over each file in the directory
-#for obj in response.get('Contents', []):
-#    filename = obj['Key']  
     filename = file['Key']
+    if filename in response_filenames: # This gets rid of the _response.txt files
+        print(f"Skipping {filename}")
+        continue
     if filename.endswith('.txt'):  # Process only .txt files
-        output_filename = filename.replace('.txt', '_response.txt')
-
+        output_filename = filename.replace('.txt', '_response.txt') 
+        if output_filename in response_filenames: # Output file already generated, skipping 
+            print(f"Skipping {filename}")
+            continue
         start_time = time.time()  # Start timing for this iteration
 
         s3_response = s3.get_object(Bucket=bucket_name, Key=filename)
@@ -80,4 +89,5 @@ for file in sorted_files:
 
 # Print total time taken after processing all files
 print(f"Total time taken: {total_time:.2f} seconds")
+
 
