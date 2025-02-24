@@ -14,8 +14,6 @@ import time
 
 aws_access_key_id = os.getenv('AWS_ACCESS_KEY')
 aws_secret_access_key = os.getenv('AWS_SECRET_KEY')
-#aws_access_key_id = "AKIAQZWJIPORVB4Y34GS"
-#aws_secret_access_key = "mX/37iw2Zw+SfxqBmtAYiixhYw3HpckNG+5zw82"
 
 
 print(f"Got access { aws_access_key_id}, got secrete {aws_secret_access_key}")

@@ -1,3 +1,6 @@
+#
+# Read the filtered and raw files from s3
+# 
 import boto3
 import pandas as pd
 from io import StringIO
