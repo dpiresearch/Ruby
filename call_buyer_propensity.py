@@ -29,7 +29,7 @@ session = boto3.Session(
 s3 = session.client('s3')
 
 bucket_name = 'rubybucket1'
-prefix = 'wcp'
+prefix = 'wcp_2'
 response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
 
 model = genai.GenerativeModel("gemini-2.0-flash-exp")
@@ -50,19 +50,19 @@ if 'Contents' in response:
 
 # Sort files by size in ascending order
 sorted_files = sorted(files, key=lambda x: x['Size'])
-response_files = [file for file in sorted_files if file['Key'].endswith('_response.txt')]
-response_filenames = [file['Key'] for file in sorted_files if file['Key'].endswith('_response.txt')]
+propensity_files = [file for file in sorted_files if file['Key'].endswith('_propensity.txt')]
+propensity_filenames = [file['Key'] for file in sorted_files if file['Key'].endswith('_propensity.txt')]
 
 # Print the sorted list of files
 for file in sorted_files:
     print(f"=== Processing File: {file['Key']}, Size: {file['Size']} bytes")
     filename = file['Key']
-    if filename in response_filenames: # This gets rid of the _response.txt files
+    if filename in propensity_filenames: # This gets rid of the _response.txt files
         print(f"Skipping {filename}")
         continue
     if filename.endswith('.txt'):  # Process only .txt files
-        output_filename = filename.replace('.txt', '_response.txt') 
-        if output_filename in response_filenames: # Output file already generated, skipping 
+        output_filename = filename.replace('.txt', '_propensity.txt') 
+        if output_filename in propensity_filenames: # Output file already generated, skipping 
             print(f"Skipping {filename}")
             continue
         start_time = time.time()  # Start timing for this iteration
@@ -72,7 +72,7 @@ for file in sorted_files:
 
         encoded_data = base64.standard_b64encode(doc_data).decode("utf-8")
 
-        prompt = f"In the attached file, find all the rows associated with the user identified by '{filename[:-4]}' and construct a timeline based on the data in the file. Describe what they're doing and what kind of personas this user might fit in."
+        prompt = f"In the attached file, find all the rows associated with the user identified by '{filename[:-4]}' and provide a score of the user's propensity to buy from 0 to 100 where 100 means the user is most likely to buy.  Output the score in json format only and provide no other output"
 
         response = model.generate_content([{'mime_type': 'text/plain', 'data': encoded_data}, prompt])
 
