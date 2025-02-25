@@ -5,7 +5,7 @@ ExperimentUsers.py - notebook where initial investigation started.
   - Gather statistics on users, actions, and possible personas
   - Also has code to split up the filtered.csv into individual files <user_id>.txt
 
-call_vertext_2.py - For each <user_id>.txt file, call Gemini to characterize the user and suggest personas
+create_responses.py - For each <user_id>.txt file, call Gemini to characterize the user and suggest personas
   - write results into <user_id>_response.txt files
 
 At this point all files were uploaded into S3
