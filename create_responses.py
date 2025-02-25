@@ -27,7 +27,7 @@ session = boto3.Session(
 s3 = session.client('s3')
 
 bucket_name = 'rubybucket1'
-prefix = 'wcp_3'
+prefix = 'wcp'
 response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
 
 model = genai.GenerativeModel("gemini-2.0-flash-exp")
@@ -50,22 +50,17 @@ if 'Contents' in response:
 sorted_files = sorted(files, key=lambda x: x['Size'])
 response_files = [file for file in sorted_files if file['Key'].endswith('_response.txt')]
 response_filenames = [file['Key'] for file in sorted_files if file['Key'].endswith('_response.txt')]
-persona_files = [file for file in sorted_files if file['Key'].endswith('_persona.txt')]
-persona_filenames = [file['Key'] for file in sorted_files if file['Key'].endswith('_persona.txt')]
 
-
-# Print the response list of files
-for file in response_files:
-# for file in sorted_files:
+# Print the sorted list of files
+for file in sorted_files:
     print(f"=== Processing File: {file['Key']}, Size: {file['Size']} bytes")
     filename = file['Key']
-    pfilename = filename.replace('_response.txt', '_persona.txt')
-    if pfilename in persona_filenames: # This gets rid of the _response.txt files
+    if filename in response_filenames: # This gets rid of the _response.txt files
         print(f"Skipping {filename}")
         continue
-    if filename.endswith('_response.txt'):  # Process only .txt files
-        output_filename = filename.replace('_response.txt', '_persona.txt') 
-        if output_filename in persona_filenames: # Output file already generated, skipping 
+    if filename.endswith('.txt'):  # Process only .txt files
+        output_filename = filename.replace('.txt', '_response.txt') 
+        if output_filename in response_filenames: # Output file already generated, skipping 
             print(f"Skipping {filename}")
             continue
         start_time = time.time()  # Start timing for this iteration
@@ -75,8 +70,7 @@ for file in response_files:
 
         encoded_data = base64.standard_b64encode(doc_data).decode("utf-8")
 
-        prompt = f"For the attached file, list the personas you find for this specific user.  Put it in a list in json format"
-        #prompt = f"In the attached file, find all the rows associated with the user identified by '{filename[:-4]}' and construct a timeline based on the data in the file. Describe what they're doing and what kind of personas this user might fit in."
+        prompt = f"In the attached file, find all the rows associated with the user identified by '{filename[:-4]}' and construct a timeline based on the data in the file. Describe what they're doing and what kind of personas this user might fit in."
 
         response = model.generate_content([{'mime_type': 'text/plain', 'data': encoded_data}, prompt])
 
